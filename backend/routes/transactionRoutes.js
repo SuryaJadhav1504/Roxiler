@@ -129,31 +129,6 @@ const transactions = [
     { price: 168, dateOfSale: "2021-09-27" },
 ];
 
-// Price range categories
-// const priceRanges = [
-//     { label: '0 - 100', min: 0, max: 100 },
-//     { label: '101 - 200', min: 101, max: 200 },
-//     { label: '201 - 300', min: 201, max: 300 },
-//     { label: '301 - 400', min: 301, max: 400 },
-//     { label: '401 - 500', min: 401, max: 500 },
-//     { label: '501 - 600', min: 501, max: 600 },
-//     { label: '601 - 700', min: 601, max: 700 },
-//     { label: '701 - 800', min: 701, max: 800 },
-//     { label: '801 - 900', min: 801, max: 900 },
-//     { label: '901 - above', min: 901, max: Infinity },
-// ];
-
-// Bar chart route
-// router.get('/transactions/bar-chart', (req, res) => {
-//     const counts = priceRanges.map(range => {
-//         const count = transactions.filter(item => item.price >= range.min && item.price <= range.max).length;
-//         return { label: range.label, count };
-//     });
-//     res.json(counts);
-// });
-
-// Pie chart data
-// Pie chart data
 // Pie chart data
 router.get('/api/pie-chart', async (req, res) => {
     const { month } = req.query;
@@ -197,6 +172,40 @@ router.get('/api/pie-chart', async (req, res) => {
     }
 });
 
+// Example API endpoints
+
+
+router.get('/api/combined', async (req, res) => {
+    try {
+        console.log('Fetching combined data...');
+
+        // Fetch data from all three APIs
+        const [barChartData, pieChartData, transactionsData] = await Promise.all([
+            axios.get(barChartApiUrl, { params: req.query }),
+            axios.get(pieChartApiUrl, { params: req.query }),
+            axios.get(transactionsApiUrl, { params: req.query }),
+        ]);
+
+        console.log('Fetched data:', {
+            barChartData: barChartData.data,
+            pieChartData: pieChartData.data,
+            transactionsData: transactionsData.data,
+        });
+
+        // Combine the data
+        const combinedData = {
+            barChart: barChartData.data,
+            pieChart: pieChartData.data,
+            transactions: transactionsData.data,
+        };
+
+        // Send combined response
+        res.json(combinedData);
+    } catch (error) {
+        console.error('Error fetching data from APIs:', error);
+        res.status(500).json({ error: 'An error occurred while fetching data.' });
+    }
+});
 
 // Define the endpoint
 router.get('/api/transactions', async (req, res) => {
@@ -210,3 +219,7 @@ router.get('/api/transactions', async (req, res) => {
   });
   
 module.exports = router;
+
+
+
+
